@@ -45,12 +45,14 @@ bool File::Open(char * str = 0, bool rw = false) {
     return true;
   }
 
-  filename = str;
-
   if (str) {
     file = fopen(str, rw ? "r+b" : "rb");
   }
 
+  if (file) {
+    filename = str;
+  }
+  
   return (file ? true : false);
 }
 
@@ -101,7 +103,6 @@ int main(int argc, char * argv[]) {
     }
 
     std::cout << "Size of file " << files[i].GetName() << " : " << files[i].Size() << '\n';
-    files[i].Close();
   }
 
   delete [] files;
