@@ -8,6 +8,10 @@ class File {
   unsigned long long size;
   unsigned long long count_str;
 
+private:
+  File(const File &f) {}
+  void operator=(const File &f) {}
+
 public:
   File(char * str = 0, bool rw = false) {
     file = 0;
@@ -57,16 +61,14 @@ bool File::Open(char * str = 0, bool rw = false) {
 }
 
 bool File::Close() {
-  int cl = 0;
-
-  if (file) {
-    cl = fclose(file);
-  }
-
   file      = 0;
   filename  = 0;
 
-  return (cl ? false : true);
+  if (file) {
+    return (fclose(file) ? false : true);
+  }
+
+  return true;
 }
 
 inline char * File::GetName() const {
@@ -78,11 +80,13 @@ inline unsigned long long File::GetSize() const {
 }
 
 unsigned long long File::Size() {
-  if (!file) return 0;
+  if (!file) {
+    return 0;
+  }
 
-  size = fseek(file, 0, SEEK_END);
-
-  if ((int)size == -1) return 0;
+  if (fseek(file, 0, SEEK_END) == -1) {
+    return 0;
+  }
 
   size = ftell(file);
 
@@ -94,16 +98,22 @@ unsigned long long File::Size() {
 }
 
 int main(int argc, char * argv[]) {
+  int i;
+  unsigned long long all_size = 0;
+
   File * files = new File[16];
 
-  for (int i = 1; argv[i] && i <= 16; i++) {
-    if (!files[i].Open(argv[i])) {
+  for (i = 0; argv[i+1] && i < 16; i++) {
+    if (!files[i].Open(argv[i+1])) {
       std::cout << "File " << files[i].GetName() << " not found!\n";
       continue;
     }
 
-    std::cout << "Size of file " << files[i].GetName() << " : " << files[i].Size() << '\n';
+    std::cout << '[' << i+1 << ']' << " Size of file " << files[i].GetName() << " : " << files[i].Size() << "\n";
+    all_size += files[i].GetSize();
   }
+
+  std::cout << "Size of all " << i << " files: " << all_size << " byte \n";
 
   delete [] files;
   return 0;
