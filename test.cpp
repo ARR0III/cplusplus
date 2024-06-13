@@ -111,6 +111,7 @@ int main(int argc, char * argv[]) {
 
     std::cout << '[' << i+1 << ']' << " Size of file " << files[i].GetName() << " : " << files[i].Size() << "\n";
     all_size += files[i].GetSize();
+    files[i].Close();
   }
 
   std::cout << "Size of all " << i << " files: " << all_size << " byte \n";
